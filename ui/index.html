@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  :root, [data-theme="dark"] {
+    --panel-bg: linear-gradient(145deg, rgba(255, 255, 255, 0.14) 0%, rgba(26, 28, 38, 0.78) 40%, rgba(16, 18, 26, 0.92) 100%);
+    --menubar-bg: rgba(255, 255, 255, 0.06);
+    --glass-specular: rgba(255, 255, 255, 0.28);
+    --glass-border: rgba(255, 255, 255, 0.16);
+    --tab-active-bg: rgba(255, 255, 255, 0.22);
+    --tab-hover-bg: rgba(255, 255, 255, 0.12);
+    --item-hover-bg: rgba(255, 255, 255, 0.14);
+    --modal-bg: rgba(28, 31, 42, 0.98);
+    --input-bg: rgba(0, 0, 0, 0.35);
+    --dropdown-bg: #232634;
+    --text-main: #f8f9fc;
+    --text-muted: rgba(235, 238, 248, 0.68);
+    --text-shadow: 0 1px 3px rgba(0, 0, 0, 0.65);
+    --accent: #0a84ff;
+  }
+
+  [data-theme="light"] {
+    --panel-bg: linear-gradient(145deg, rgba(255, 255, 255, 0.88) 0%, rgba(242, 245, 252, 0.84) 50%, rgba(232, 236, 248, 0.92) 100%);
+    --menubar-bg: rgba(0, 0, 0, 0.05);
+    --glass-specular: rgba(255, 255, 255, 0.95);
+    --glass-border: rgba(0, 0, 0, 0.12);
+    --tab-active-bg: rgba(255, 255, 255, 0.95);
+    --tab-hover-bg: rgba(0, 0, 0, 0.06);
+    --item-hover-bg: rgba(0, 0, 0, 0.07);
+    --modal-bg: rgba(248, 250, 255, 0.98);
+    --input-bg: rgba(255, 255, 255, 0.92);
+    --dropdown-bg: #ffffff;
+    --text-main: #181a22;
+    --text-muted: rgba(28, 32, 44, 0.64);
+    --text-shadow: none;
+    --accent: #007aff;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    user-select: none;
+  }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    overflow: hidden;
+    padding: 2px;
+  }
+
+  .tahoe-window {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: var(--panel-bg);
+    border-radius: 20px;
+    border: 1px solid var(--glass-border);
+    box-shadow: inset 0 1px 1px var(--glass-specular);
+    color: var(--text-main);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .macos-menubar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 12px;
+    background: var(--menubar-bg);
+    border-bottom: 1px solid var(--glass-border);
+    min-height: 40px;
+    z-index: 2;
+  }
+
+  .tabs-left-group {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 6px;
+    flex: 1;
+  }
+
+  .mac-tab {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 5px 13px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    overflow: visible;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+
+  .mac-tab:hover {
+    background: var(--tab-hover-bg);
+    color: var(--text-main);
+  }
+
+  .mac-tab.active {
+    background: var(--tab-active-bg);
+    color: var(--text-main);
+    font-weight: 600;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  }
+
+  .mac-tab svg {
+    width: 13px;
+    height: 13px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    flex-shrink: 0;
+  }
+
+  .tab-del-btn {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 700;
+    background: #e5484d;
+    color: #ffffff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.35);
+    line-height: 1;
+    z-index: 5;
+  }
+  .mac-tab:hover .tab-del-btn {
+    display: flex;
+  }
+  .tab-del-btn:hover {
+    background: #ff2b32;
+  }
+
+  .menubar-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    flex-shrink: 0;
+    align-self: flex-start;
+  }
+
+  .icon-action-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+  .icon-action-btn:hover {
+    background: var(--tab-hover-bg);
+    color: var(--text-main);
+  }
+  .icon-action-btn svg {
+    width: 15px;
+    height: 15px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2.1;
+  }
+
+  .main-stage {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 12px 14px;
+    overflow: hidden;
+  }
+
+  .empty-view {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 6px;
+    color: var(--text-muted);
+    font-size: 12.5px;
+    padding: 10px;
+  }
+
+  .view-grid {
+    flex: 1;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+    grid-auto-rows: max-content;
+    gap: 8px;
+    padding: 4px 2px 38px 2px;
+  }
+
+  .view-list {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 2px 2px 38px 2px;
+  }
+
+  .view-icons-only {
+    flex: 1;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(54px, 1fr));
+    grid-auto-rows: max-content;
+    gap: 8px;
+    padding: 4px 2px 38px 2px;
+  }
+
+  .view-text-only {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 2px 2px 38px 2px;
+  }
+
+  .apps-container::-webkit-scrollbar,
+  .combo-menu::-webkit-scrollbar { width: 4px; }
+  .apps-container::-webkit-scrollbar-thumb,
+  .combo-menu::-webkit-scrollbar-thumb {
+    background: rgba(150, 155, 175, 0.4);
+    border-radius: 4px;
+  }
+  .combo-menu::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .app-tile {
+    position: relative;
+    border-radius: 11px;
+    cursor: pointer;
+    overflow: visible;
+    transition: background-color 0.14s ease;
+  }
+  .app-tile:hover {
+    background: var(--item-hover-bg);
+  }
+
+  .view-grid .app-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 4px;
+  }
+
+  .view-list .app-tile {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 10px;
+  }
+
+  .view-icons-only .app-tile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+  }
+
+  .view-text-only .app-tile {
+    display: flex;
+    align-items: center;
+    padding: 7px 12px;
+    background: var(--menubar-bg);
+  }
+
+  .app-tile img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    flex-shrink: 0;
+    filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.25));
+  }
+  .view-list .app-tile img {
+    width: 24px;
+    height: 24px;
+  }
+
+  .app-tile-fallback {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    background: var(--accent);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .view-list .app-tile-fallback {
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+  }
+
+  .app-tile-name {
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--text-main);
+    text-shadow: var(--text-shadow);
+  }
+  .view-grid .app-tile-name {
+    width: 100%;
+    text-align: center;
+    line-height: 1.2;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+  }
+  .view-list .app-tile-name,
+  .view-text-only .app-tile-name {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .app-tile-del {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    border-radius: 50%;
+    border: none;
+    background: #e5484d;
+    color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 4;
+  }
+  .app-tile-del svg {
+    width: 10px;
+    height: 10px;
+    stroke: #ffffff;
+    stroke-width: 2.5;
+    fill: none;
+  }
+  .view-list .app-tile-del,
+  .view-text-only .app-tile-del {
+    position: static;
+    margin-left: auto;
+  }
+  .app-tile:hover .app-tile-del { display: flex; }
+  .app-tile-del:hover { background: #ff2b32; }
+
+  .fab-add-shortcut {
+    position: absolute;
+    bottom: 12px;
+    right: 14px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 5;
+  }
+  .fab-add-shortcut:hover { filter: brightness(1.12); }
+  .fab-add-shortcut svg {
+    width: 17px;
+    height: 17px;
+    stroke: #fff;
+    stroke-width: 2.4;
+    fill: none;
+  }
+
+  /* Modales internos */
+  .sheet-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    z-index: 30;
+  }
+  .sheet-overlay.open { display: flex; }
+
+  .sheet-box {
+    width: 100%;
+    max-width: 340px;
+    background: var(--modal-bg);
+    border: 1px solid var(--glass-border);
+    box-shadow: inset 0 1px 0 var(--glass-specular), 0 12px 28px rgba(0, 0, 0, 0.45);
+    border-radius: 16px;
+    padding: 13px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    color: var(--text-main);
+  }
+
+  .sheet-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .field-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: -3px;
+  }
+
+  .sheet-input {
+    width: 100%;
+    padding: 7px 10px;
+    border-radius: 9px;
+    border: 1px solid var(--glass-border);
+    background: var(--input-bg);
+    color: var(--text-main);
+    font-size: 12.5px;
+    outline: none;
+  }
+  .sheet-input:focus { border-color: var(--accent); }
+
+  /* Combo desplegable que abre hacia arriba para no recortar nunca la última opción */
+  .custom-combo {
+    position: relative;
+    width: 100%;
+  }
+  .combo-trigger {
+    width: 100%;
+    padding: 7px 10px;
+    border-radius: 9px;
+    border: 1px solid var(--glass-border);
+    background: var(--input-bg);
+    color: var(--text-main);
+    font-size: 12.5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+  }
+  .combo-trigger:hover { border-color: var(--accent); }
+  .combo-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .combo-left svg, .combo-option svg {
+    width: 15px;
+    height: 15px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    flex-shrink: 0;
+  }
+  .combo-menu {
+    position: absolute;
+    bottom: calc(100% + 5px);
+    left: 0;
+    right: 0;
+    max-height: 132px;
+    overflow-y: auto;
+    background: var(--dropdown-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.45);
+    display: none;
+    flex-direction: column;
+    padding: 4px;
+    z-index: 50;
+  }
+  .combo-menu.open { display: flex; }
+  .combo-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 7px;
+    font-size: 12px;
+    color: var(--text-main);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .combo-option:hover, .combo-option.selected {
+    background: var(--accent);
+    color: #ffffff;
+  }
+
+  .accent-swatches {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    padding: 4px 2px;
+  }
+  .swatch-btn {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    position: relative;
+  }
+  .swatch-btn.active {
+    border-color: #ffffff;
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+  .custom-color-wrap {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 1px solid var(--glass-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red);
+    cursor: pointer;
+  }
+  .custom-color-wrap input[type="color"] {
+    opacity: 0;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+  }
+
+  .segmented-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 3px;
+    background: var(--menubar-bg);
+    padding: 3px;
+    border-radius: 9px;
+    border: 1px solid var(--glass-border);
+  }
+  .segmented-bar.cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .seg-opt {
+    padding: 5px 2px;
+    border-radius: 7px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 10.5px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .seg-opt.active {
+    background: var(--accent);
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .sheet-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    margin-top: 2px;
+  }
+  .btn-sheet {
+    padding: 6px 13px;
+    border-radius: 8px;
+    border: none;
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-sec { background: var(--menubar-bg); color: var(--text-main); }
+  .btn-pri { background: var(--accent); color: #fff; }
+</style>
+</head>
+<body>
+  <div class="tahoe-window">
+    <div class="macos-menubar">
+      <div class="tabs-left-group" id="tabsGroup"></div>
+      <div class="menubar-actions">
+        <button type="button" class="icon-action-btn" id="btnOpenNewTab" title="Nueva pestaña">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <button type="button" class="icon-action-btn" id="btnOpenSettings" title="Configuración">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="main-stage" id="mainStage"></div>
+
+    <!-- Modal: Crear Nueva Pestaña -->
+    <div class="sheet-overlay" id="modalNewTab">
+      <div class="sheet-box">
+        <div class="sheet-title">Nueva Pestaña</div>
+        <div class="field-label">Nombre</div>
+        <input type="text" class="sheet-input" id="inputTabName" placeholder="Ej. Trabajo, Juegos, Diseño..." maxlength="20" />
+
+        <div class="field-label">Ícono de pestaña</div>
+        <div class="custom-combo" id="iconCombo">
+          <div class="combo-trigger" id="comboTrigger">
+            <div class="combo-left" id="comboSelectedDisplay"></div>
+            <span style="font-size: 10px; opacity: 0.7;">▲</span>
+          </div>
+          <div class="combo-menu" id="comboMenu"></div>
+        </div>
+
+        <div class="sheet-footer">
+          <button type="button" class="btn-sheet btn-sec" id="btnCancelTab">Cancelar</button>
+          <button type="button" class="btn-sheet btn-pri" id="btnConfirmTab">Crear</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Configuración General -->
+    <div class="sheet-overlay" id="modalSettings">
+      <div class="sheet-box">
+        <div class="sheet-title">Configuración</div>
+
+        <div class="field-label">Tema visual</div>
+        <div class="segmented-bar" id="themeSegmented">
+          <button type="button" class="seg-opt" data-theme-val="light">Claro</button>
+          <button type="button" class="seg-opt" data-theme-val="dark">Oscuro</button>
+          <button type="button" class="seg-opt" data-theme-val="system">Equipo</button>
+          <button type="button" class="seg-opt" data-theme-val="auto">Auto</button>
+        </div>
+
+        <div class="field-label">Color de acento (estilo macOS)</div>
+        <div class="accent-swatches" id="accentSwatches"></div>
+
+        <div class="field-label">Ordenamiento</div>
+        <div class="segmented-bar cols-3" id="sortSegmented">
+          <button type="button" class="seg-opt" data-sort-val="manual">Manual</button>
+          <button type="button" class="seg-opt" data-sort-val="az">A → Z</button>
+          <button type="button" class="seg-opt" data-sort-val="za">Z → A</button>
+        </div>
+
+        <div class="field-label">Visualización</div>
+        <div class="segmented-bar" id="viewSegmented">
+          <button type="button" class="seg-opt" data-view-val="grid">Cuadrícula</button>
+          <button type="button" class="seg-opt" data-view-val="list">Lista</button>
+          <button type="button" class="seg-opt" data-view-val="icons">Íconos</button>
+          <button type="button" class="seg-opt" data-view-val="text">Texto</button>
+        </div>
+
+        <div class="sheet-footer">
+          <button type="button" class="btn-sheet btn-pri" id="btnCloseSettings">Listo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const instanceId = urlParams.get("id") || "tabweast_default";
+    const storageKey = "tabweast_tahoe_" + instanceId;
+
+    const TAB_ICONS = [
+      { id: "default", label: "Por defecto", svg: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>' },
+      { id: "folder",  label: "Carpeta",     svg: '<svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>' },
+      { id: "star",    label: "Favoritos",   svg: '<svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>' },
+      { id: "games",   label: "Juegos",      svg: '<svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="4"/><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><circle cx="15" cy="11" r="1"/><circle cx="17" cy="13" r="1"/></svg>' },
+      { id: "apps",    label: "Aplicaciones",svg: '<svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>' },
+      { id: "work",    label: "Trabajo",     svg: '<svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>' },
+      { id: "design",  label: "Diseño",      svg: '<svg viewBox="0 0 24 24"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg>' },
+      { id: "code",    label: "Desarrollo",  svg: '<svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>' },
+      { id: "media",   label: "Multimedia",  svg: '<svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>' },
+      { id: "web",     label: "Navegador",   svg: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>' }
+    ];
+
+    const MAC_ACCENTS = [
+      { name: "Azul",     hex: "#0a84ff" },
+      { name: "Morado",   hex: "#7d7aee" },
+      { name: "Rosa",     hex: "#ff375f" },
+      { name: "Rojo",     hex: "#ff453a" },
+      { name: "Naranja",  hex: "#ff9f0a" },
+      { name: "Amarillo", hex: "#ffd60a" },
+      { name: "Verde",    hex: "#30d158" },
+      { name: "Grafito",  hex: "#8e8e93" }
+    ];
+
+    let state;
+    try {
+      state = JSON.parse(localStorage.getItem(storageKey));
+    } catch (e) {
+      state = null;
+    }
+    if (!state || !Array.isArray(state.tabs)) {
+      state = {
+        tabs: [],
+        activeTabId: null,
+        themeMode: "system",
+        accentColor: "#0a84ff",
+        sortMode: "manual",
+        viewMode: "grid"
+      };
+    }
+    if (!state.accentColor) state.accentColor = "#0a84ff";
+    if (!state.sortMode) state.sortMode = "manual";
+    if (!state.viewMode) state.viewMode = "grid";
+
+    let selectedNewTabIcon = "default";
+    let systemPrefersDark = true;
+    let skipNextResize = false;
+
+    function saveState() {
+      localStorage.setItem(storageKey, JSON.stringify(state));
+    }
+
+    function sendToCpp(cmd, arg) {
+      const payload = arg !== undefined ? `${cmd}|${arg}` : `${cmd}|`;
+      if (window.chrome && window.chrome.webview) {
+        window.chrome.webview.postMessage(payload);
+      }
+    }
+
+    function applyPreferencesUI() {
+      let resolvedDark = true;
+      if (state.themeMode === "light") resolvedDark = false;
+      else if (state.themeMode === "dark") resolvedDark = true;
+      else if (state.themeMode === "auto") {
+        const hour = new Date().getHours();
+        resolvedDark = (hour < 6 || hour >= 18);
+      } else {
+        resolvedDark = systemPrefersDark;
+      }
+      document.documentElement.setAttribute("data-theme", resolvedDark ? "dark" : "light");
+      document.documentElement.style.setProperty("--accent", state.accentColor);
+
+      document.querySelectorAll("[data-theme-val]").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.themeVal === state.themeMode);
+      });
+      document.querySelectorAll("[data-sort-val]").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.sortVal === state.sortMode);
+      });
+      document.querySelectorAll("[data-view-val]").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.viewVal === state.viewMode);
+      });
+
+      buildAccentSwatches();
+    }
+
+    function buildAccentSwatches() {
+      const wrap = document.getElementById("accentSwatches");
+      if (!wrap) return;
+      wrap.innerHTML = "";
+
+      MAC_ACCENTS.forEach(col => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "swatch-btn" + (state.accentColor.toLowerCase() === col.hex.toLowerCase() ? " active" : "");
+        btn.style.backgroundColor = col.hex;
+        btn.title = col.name;
+        btn.onclick = () => {
+          state.accentColor = col.hex;
+          saveState();
+          applyPreferencesUI();
+        };
+        wrap.appendChild(btn);
+      });
+
+      const customWrap = document.createElement("label");
+      customWrap.className = "custom-color-wrap";
+      customWrap.title = "Color personalizado";
+      const colorInput = document.createElement("input");
+      colorInput.type = "color";
+      colorInput.value = state.accentColor;
+      colorInput.oninput = (e) => {
+        state.accentColor = e.target.value;
+        saveState();
+        applyPreferencesUI();
+      };
+      customWrap.appendChild(colorInput);
+      wrap.appendChild(customWrap);
+    }
+
+    function updateDynamicWindowSize(itemCount, hasModalOpen) {
+      if (skipNextResize) {
+        skipNextResize = false;
+        return;
+      }
+
+      if (hasModalOpen) {
+        // Mantener un alto cómodo para cualquier modal sin sacar el cursor
+        sendToCpp("RESIZE", "380,350");
+        return;
+      }
+
+      if (state.tabs.length === 0 || itemCount === 0) {
+        sendToCpp("RESIZE", "360,210");
+        return;
+      }
+
+      if (state.viewMode === "list" || state.viewMode === "text") {
+        const visibleRows = Math.min(7, itemCount);
+        const calcH = Math.max(210, 62 + visibleRows * 38 + 30);
+        sendToCpp("RESIZE", `360,${calcH}`);
+        return;
+      }
+
+      if (state.viewMode === "icons") {
+        const cols = itemCount <= 5 ? Math.max(4, itemCount) : 6;
+        const rows = Math.min(5, Math.ceil(itemCount / cols));
+        const calcW = Math.max(360, cols * 62 + 34);
+        const calcH = Math.max(210, 62 + rows * 60 + 28);
+        sendToCpp("RESIZE", `${calcW},${calcH}`);
+        return;
+      }
+
+      const cols = itemCount <= 4 ? Math.max(3, itemCount) : (itemCount <= 12 ? 4 : 5);
+      const rows = Math.min(4, Math.ceil(itemCount / cols));
+      const calcW = Math.max(360, cols * 86 + 34);
+      const calcH = Math.max(210, 62 + rows * 82 + 28);
+      sendToCpp("RESIZE", `${calcW},${calcH}`);
+    }
+
+    function getSortedItems(items) {
+      const mapped = items.map((item, originalIndex) => ({ ...item, originalIndex }));
+      if (state.sortMode === "az") {
+        mapped.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
+      } else if (state.sortMode === "za") {
+        mapped.sort((a, b) => b.name.localeCompare(a.name, undefined, { sensitivity: "base" }));
+      }
+      return mapped;
+    }
+
+    function render() {
+      applyPreferencesUI();
+      const tabsGroup = document.getElementById("tabsGroup");
+      const mainStage = document.getElementById("mainStage");
+      tabsGroup.innerHTML = "";
+      mainStage.innerHTML = "";
+
+      state.tabs.forEach(tab => {
+        const iconObj = TAB_ICONS.find(ic => ic.id === (tab.iconId || "default")) || TAB_ICONS[0];
+        const el = document.createElement("div");
+        el.className = "mac-tab" + (tab.id === state.activeTabId ? " active" : "");
+        el.onclick = () => {
+          state.activeTabId = tab.id;
+          saveState();
+          render();
+        };
+
+        el.innerHTML = iconObj.svg + "<span>" + tab.name + "</span>";
+
+        const delSpan = document.createElement("span");
+        delSpan.className = "tab-del-btn";
+        delSpan.textContent = "×";
+        delSpan.title = "Eliminar pestaña";
+        delSpan.onclick = (e) => {
+          e.stopPropagation();
+          state.tabs = state.tabs.filter(t => t.id !== tab.id);
+          if (state.activeTabId === tab.id) {
+            state.activeTabId = state.tabs.length > 0 ? state.tabs[0].id : null;
+          }
+          saveState();
+          render();
+        };
+
+        el.appendChild(delSpan);
+        tabsGroup.appendChild(el);
+      });
+
+      const anyModalOpen =
+        document.getElementById("modalNewTab").classList.contains("open") ||
+        document.getElementById("modalSettings").classList.contains("open");
+
+      if (state.tabs.length === 0) {
+        mainStage.innerHTML = '<div class="empty-view"><div>No hay pestañas creadas aún.</div><div>Pulsa <strong>+</strong> arriba para crear tu primera pestaña.</div></div>';
+        updateDynamicWindowSize(0, anyModalOpen);
+        return;
+      }
+
+      const activeTab = state.tabs.find(t => t.id === state.activeTabId) || state.tabs[0];
+      state.activeTabId = activeTab.id;
+
+      if (activeTab.items.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "empty-view";
+        empty.innerHTML = '<div>Esta pestaña está vacía.<br>Usa el botón circular <strong>+</strong> para añadir accesos directos.</div>';
+        mainStage.appendChild(empty);
+      } else {
+        const container = document.createElement("div");
+        const modeClass =
+          state.viewMode === "list"  ? "view-list" :
+          state.viewMode === "icons" ? "view-icons-only" :
+          state.viewMode === "text"  ? "view-text-only" : "view-grid";
+        container.className = "apps-container " + modeClass;
+
+        const sortedItems = getSortedItems(activeTab.items);
+
+        sortedItems.forEach(item => {
+          const tile = document.createElement("div");
+          tile.className = "app-tile";
+          tile.title = item.name;
+          tile.onclick = () => sendToCpp("OPEN_APP", item.path);
+
+          if (state.viewMode !== "text") {
+            if (item.icon && item.icon.startsWith("data:image")) {
+              const img = document.createElement("img");
+              img.src = item.icon;
+              tile.appendChild(img);
+            } else {
+              const fb = document.createElement("div");
+              fb.className = "app-tile-fallback";
+              fb.textContent = item.name.charAt(0).toUpperCase();
+              tile.appendChild(fb);
+            }
+          }
+
+          if (state.viewMode !== "icons") {
+            const lbl = document.createElement("div");
+            lbl.className = "app-tile-name";
+            lbl.textContent = item.name;
+            tile.appendChild(lbl);
+          }
+
+          const delBtn = document.createElement("button");
+          delBtn.type = "button";
+          delBtn.className = "app-tile-del";
+          delBtn.innerHTML = '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+          delBtn.onclick = (e) => {
+            e.stopPropagation();
+            activeTab.items.splice(item.originalIndex, 1);
+            saveState();
+            render();
+          };
+          tile.appendChild(delBtn);
+
+          container.appendChild(tile);
+        });
+
+        mainStage.appendChild(container);
+      }
+
+      const fab = document.createElement("button");
+      fab.type = "button";
+      fab.className = "fab-add-shortcut";
+      fab.title = "Añadir acceso directo o aplicación";
+      fab.innerHTML = '<svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+      fab.onclick = () => sendToCpp("PICK_FILE");
+      mainStage.appendChild(fab);
+
+      updateDynamicWindowSize(activeTab.items.length, anyModalOpen);
+    }
+
+    function buildIconCombo() {
+      const selectedDisplay = document.getElementById("comboSelectedDisplay");
+      const comboMenu = document.getElementById("comboMenu");
+
+      const currentObj = TAB_ICONS.find(ic => ic.id === selectedNewTabIcon) || TAB_ICONS[0];
+      selectedDisplay.innerHTML = currentObj.svg + "<span>" + currentObj.label + "</span>";
+
+      comboMenu.innerHTML = "";
+      TAB_ICONS.forEach(ic => {
+        const opt = document.createElement("div");
+        opt.className = "combo-option" + (ic.id === selectedNewTabIcon ? " selected" : "");
+        opt.innerHTML = ic.svg + "<span>" + ic.label + "</span>";
+        opt.onclick = (e) => {
+          e.stopPropagation();
+          selectedNewTabIcon = ic.id;
+          comboMenu.classList.remove("open");
+          buildIconCombo();
+        };
+        comboMenu.appendChild(opt);
+      });
+    }
+
+    document.getElementById("comboTrigger").onclick = (e) => {
+      e.stopPropagation();
+      document.getElementById("comboMenu").classList.toggle("open");
+    };
+
+    document.addEventListener("click", () => {
+      document.getElementById("comboMenu").classList.remove("open");
+    });
+
+    const modalNewTab = document.getElementById("modalNewTab");
+    const inputTabName = document.getElementById("inputTabName");
+    const modalSettings = document.getElementById("modalSettings");
+
+    document.getElementById("btnOpenNewTab").onclick = (e) => {
+      e.stopPropagation();
+      modalSettings.classList.remove("open");
+      document.getElementById("comboMenu").classList.remove("open");
+      inputTabName.value = "";
+      selectedNewTabIcon = "default";
+      buildIconCombo();
+      modalNewTab.classList.add("open");
+      updateDynamicWindowSize(0, true);
+      setTimeout(() => inputTabName.focus(), 40);
+    };
+
+    document.getElementById("btnCancelTab").onclick = (e) => {
+      e.stopPropagation();
+      modalNewTab.classList.remove("open");
+      skipNextResize = true;
+      render();
+    };
+
+    function createTabConfirm(e) {
+      if (e) e.stopPropagation();
+      const name = inputTabName.value.trim();
+      if (!name) return;
+      const newId = "tab_" + Date.now();
+      state.tabs.push({
+        id: newId,
+        name: name,
+        iconId: selectedNewTabIcon || "default",
+        items: []
+      });
+      state.activeTabId = newId;
+      saveState();
+      modalNewTab.classList.remove("open");
+      // Evitar encogimiento brusco al crear para que el cursor no quede fuera de la ventana
+      skipNextResize = true;
+      render();
+    }
+
+    document.getElementById("btnConfirmTab").onclick = createTabConfirm;
+    inputTabName.onkeydown = (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        createTabConfirm(e);
+      } else if (e.key === "Escape") {
+        modalNewTab.classList.remove("open");
+        skipNextResize = true;
+        render();
+      }
+    };
+
+    document.getElementById("btnOpenSettings").onclick = (e) => {
+      e.stopPropagation();
+      modalNewTab.classList.remove("open");
+      sendToCpp("REQUEST_THEME");
+      modalSettings.classList.add("open");
+      updateDynamicWindowSize(0, true);
+    };
+
+    document.getElementById("btnCloseSettings").onclick = (e) => {
+      e.stopPropagation();
+      modalSettings.classList.remove("open");
+      skipNextResize = true;
+      render();
+    };
+
+    document.querySelectorAll("[data-theme-val]").forEach(btn => {
+      btn.onclick = () => {
+        state.themeMode = btn.dataset.themeVal;
+        saveState();
+        applyPreferencesUI();
+      };
+    });
+
+    document.querySelectorAll("[data-sort-val]").forEach(btn => {
+      btn.onclick = () => {
+        state.sortMode = btn.dataset.sortVal;
+        saveState();
+        applyPreferencesUI();
+      };
+    });
+
+    document.querySelectorAll("[data-view-val]").forEach(btn => {
+      btn.onclick = () => {
+        state.viewMode = btn.dataset.viewVal;
+        saveState();
+        applyPreferencesUI();
+      };
+    });
+
+    if (window.chrome && window.chrome.webview) {
+      window.chrome.webview.addEventListener("message", event => {
+        const data = event.data;
+        if (data.event === "FILE_SELECTED" && data.path && state.activeTabId) {
+          const activeTab = state.tabs.find(t => t.id === state.activeTabId);
+          if (activeTab) {
+            const cleanName = data.path.split(/[\\/]/).pop().replace(/\.[^/.]+$/, "");
+            activeTab.items.push({
+              name: cleanName,
+              path: data.path,
+              icon: data.icon || ""
+            });
+            saveState();
+            render();
+          }
+        } else if (data.event === "SYS_THEME") {
+          systemPrefersDark = !!data.dark;
+          applyPreferencesUI();
+        }
+      });
+    }
+
+    sendToCpp("REQUEST_THEME");
+    render();
+  </script>
+</body>
+</html>
